@@ -386,9 +386,9 @@
     <table>
       <thead>
         <tr>
-          <th>번호</th>
           <th>학년</th>
           <th>반</th>
+          <th>번호</th>
           <th>이름</th>
           <th>관심 분야</th>
           <th>기업 A</th>
@@ -437,7 +437,7 @@ async function loadData() {
     const SHEET_ID = '1L98frGfSmpzACFLepgo2hDTYj3c2iwdm3zgJFDq9prw';
     const GID = '966922767';
     const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${GID}&t=${Date.now()}`;
-    const res = await fetch(url);
+    const res = await fetch(url, { redirect: 'follow', credentials: 'omit' });
     const csv = await res.text();
 
     const rows = csv.trim().split('\n').map(r => {
@@ -452,6 +452,10 @@ async function loadData() {
       return result;
     });
 
+    // Sheets 비공개시 HTML 로그인 페이지가 반환됨 감지
+    if (csv.trim().startsWith('<!')) {
+      throw new Error('Sheets가 비공개 상태입니다. 공유 설정을 확인하세요.');
+    }
     if (rows.length < 2) {
       allData = [];
     } else {
@@ -525,9 +529,9 @@ function renderTable() {
 
   tbody.innerHTML = rows.map((r, i) => `
     <tr>
-      <td>${r['번호'] || i+1}</td>
       <td style="text-align:center"><span style="background:#E3F2FD;color:#1565C0;padding:2px 8px;border-radius:8px;font-weight:700;font-size:12px">${r['학년']||'—'}학년</span></td>
       <td style="text-align:center"><span style="background:#E8F5F0;color:#2E7D32;padding:2px 8px;border-radius:8px;font-weight:700;font-size:12px">${r['반']||'—'}반</span></td>
+      <td style="text-align:center">${r['번호'] || i+1}</td>
       <td><strong>${r['이름'] || '—'}</strong></td>
       <td>${r['관심분야'] || '—'}</td>
       <td>${r['기업A'] || '—'}</td>
