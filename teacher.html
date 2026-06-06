@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>교사 대시보드</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap');
+:root{
+  --teal:#1e3a32; --teal2:#1e6b57; --teal-pale:#e8f5f0;
+  --blue:#5a9bd4; --blue-pale:#eef4fd;
+  --a:#c8ede4; --a-bd:#7ecbbe; --a-txt:#1a4a3a;
+  --b:#f5c0b8; --b-bd:#f4a0a0; --b-txt:#6b1a1a;
+  --amber:#e6900a; --amber-pale:#fff7e6;
+  --gold:#f5d060; --purple:#cecbf6;
+  --gray:#f4f6fa; --border:#e0e8e4;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Noto Sans KR',sans-serif;background:#eef2f0;min-height:100vh;}
+.hdr{background:var(--teal);padding:16px 28px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;}
+.hdr h1{color:#fff;font-size:18px;font-weight:900;}
+.hdr p{color:rgba(255,255,255,.65);font-size:12px;margin-top:2px;}
+.hdr-right{display:flex;align-items:center;gap:10px;}
+.btn{padding:7px 16px;border:none;border-radius:7px;font-family:'Noto Sans KR',sans-serif;font-size:12.5px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:5px;}
+.btn-refresh{background:rgba(255,255,255,.15);color:#fff;border:1px solid rgba(255,255,255,.3);}
+.btn-export{background:#fff;color:var(--teal);}
+.last-upd{color:rgba(255,255,255,.55);font-size:11px;}
+.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;padding:20px 28px 0;}
+.card{background:#fff;border-radius:10px;padding:18px 20px;box-shadow:0 2px 8px rgba(0,0,0,.06);}
+.card .lbl{font-size:11px;font-weight:700;color:#999;letter-spacing:.5px;margin-bottom:6px;}
+.card .val{font-size:30px;font-weight:900;line-height:1;}
+.card .sub{font-size:11px;color:#bbb;margin-top:3px;}
+.card.c-total .val{color:var(--teal);}
+.card.c-done .val{color:var(--teal2);}
+.card.c-pend .val{color:var(--amber);}
+.card.c-rate .val{color:var(--blue);}
+.prog-wrap{background:#fff;border-radius:10px;padding:16px 20px;box-shadow:0 2px 8px rgba(0,0,0,.06);margin:14px 28px 0;}
+.prog-top{display:flex;justify-content:space-between;font-size:12px;font-weight:600;color:#666;margin-bottom:7px;}
+.prog-bar{height:10px;background:#eee;border-radius:99px;overflow:hidden;}
+.prog-fill{height:100%;background:linear-gradient(90deg,var(--teal2),var(--blue));border-radius:99px;transition:width .6s;}
+.url-box{background:#fff;border-radius:10px;padding:18px 20px;box-shadow:0 2px 8px rgba(0,0,0,.06);margin:14px 28px 0;}
+.url-box h3{font-size:14px;font-weight:800;color:var(--teal);margin-bottom:12px;}
+.url-form{display:flex;align-items:flex-end;gap:8px;flex-wrap:wrap;}
+.url-form .f{display:flex;flex-direction:column;gap:3px;}
+.url-form label{font-size:10px;font-weight:700;color:#999;}
+.url-form input{border:1.5px solid var(--border);border-radius:6px;padding:6px 9px;font-family:'Noto Sans KR',sans-serif;font-size:13px;width:72px;outline:none;}
+.url-form input:focus{border-color:var(--teal2);}
+.url-form .f-name input{width:110px;}
+.url-result{margin-top:12px;background:var(--gray);border-radius:7px;padding:10px 14px;display:flex;align-items:center;gap:10px;}
+.url-result code{font-size:11.5px;color:var(--blue);flex:1;word-break:break-all;}
+.copy-btn{padding:5px 14px;background:var(--teal);color:#fff;border:none;border-radius:6px;font-family:'Noto Sans KR',sans-serif;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;}
+.url-tip{font-size:10.5px;color:#aaa;margin-top:6px;}
+.tabs{display:flex;padding:18px 28px 0;}
+.tab{padding:9px 22px;font-size:13px;font-weight:600;color:#999;cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-1px;}
+.tab.active{color:var(--teal);border-bottom-color:var(--teal);}
+.tabs-border{height:1px;background:var(--border);margin:0 28px;}
+.tbl-area{padding:0 28px 32px;}
+.tbl-toolbar{display:flex;align-items:center;justify-content:space-between;padding:14px 0 10px;}
+.search{display:flex;align-items:center;gap:7px;background:#fff;border:1.5px solid var(--border);border-radius:7px;padding:5px 12px;width:240px;}
+.search input{border:none;outline:none;font-family:'Noto Sans KR',sans-serif;font-size:13px;width:100%;}
+table{width:100%;border-collapse:collapse;background:#fff;border-radius:10px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.06);}
+thead tr{background:var(--gray);}
+th{padding:11px 14px;text-align:left;font-size:11.5px;font-weight:700;color:#777;}
+td{padding:12px 14px;font-size:12.5px;color:#333;border-top:1px solid var(--border);}
+tr:hover td{background:#fafcfb;}
+.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:700;}
+.badge.done{background:var(--teal-pale);color:var(--teal2);}
+.badge.pend{background:var(--amber-pale);color:var(--amber);}
+.detail-btn{padding:4px 11px;border:1.5px solid var(--border);border-radius:6px;background:#fff;font-family:'Noto Sans KR',sans-serif;font-size:11.5px;font-weight:600;color:var(--blue);cursor:pointer;}
+.detail-btn:hover{background:var(--blue-pale);border-color:var(--blue);}
+.detail-btn:disabled{color:#ccc;border-color:#eee;cursor:not-allowed;}
+.empty{text-align:center;padding:44px;color:#bbb;font-size:13px;}
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:100;align-items:center;justify-content:center;}
+.modal-bg.show{display:flex;}
+.modal{background:#fff;border-radius:14px;width:740px;max-height:82vh;overflow-y:auto;padding:28px;box-shadow:0 8px 40px rgba(0,0,0,.2);}
+.modal-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;}
+.modal-hdr h2{font-size:16px;font-weight:900;color:var(--teal);}
+.modal-close{background:none;border:none;font-size:22px;cursor:pointer;color:#aaa;}
+.m-sec{margin-bottom:18px;}
+.m-sec h3{font-size:12px;font-weight:700;color:var(--blue);margin-bottom:8px;padding-bottom:4px;border-bottom:1.5px solid var(--blue-pale);}
+.m-row{display:flex;gap:8px;margin-bottom:5px;}
+.m-key{font-size:11.5px;font-weight:700;color:#999;min-width:105px;flex-shrink:0;}
+.m-val{font-size:12.5px;color:#333;line-height:1.5;}
+.m-2col{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.m-col-a{border-left:3px solid var(--a-bd);padding-left:10px;}
+.m-col-b{border-left:3px solid var(--b-bd);padding-left:10px;}
+.m-col-title{font-size:12.5px;font-weight:800;margin-bottom:8px;}
+.m-col-title.a{color:var(--a-txt);}
+.m-col-title.b{color:var(--b-txt);}
+.m-tbl{width:100%;border-collapse:collapse;font-size:12px;}
+.m-tbl th,.m-tbl td{padding:7px 10px;border:1px solid var(--border);text-align:left;}
+.m-tbl th.th-item{background:var(--purple);color:#3a3070;font-weight:700;width:22%;}
+.m-tbl th.th-a{background:var(--a);color:var(--a-txt);font-weight:700;}
+.m-tbl th.th-b{background:var(--b);color:var(--b-txt);font-weight:700;}
+.m-tbl tr:nth-child(odd) td{background:#fafaf8;}
+.m-final{background:var(--gold);border-radius:8px;padding:10px 14px;display:flex;align-items:center;gap:12px;margin-top:8px;}
+.m-final .lbl{font-size:12.5px;font-weight:800;color:#3a2800;white-space:nowrap;}
+.m-final .val{font-size:12.5px;color:#3a2800;}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <div>
+    <h1>📊 기업탐색 학습지 — 교사 대시보드</h1>
+    <p id="classInfo">로딩 중...</p>
+  </div>
+  <div class="hdr-right">
+    <span class="last-upd" id="lastUpd">-</span>
+    <button class="btn btn-refresh" onclick="loadData()">🔄 새로고침</button>
+    <button class="btn btn-export" onclick="exportCSV()">📥 엑셀 내보내기</button>
+  </div>
+</div>
+
+<div class="cards">
+  <div class="card c-total"><div class="lbl">전체 학생</div><div class="val" id="cTotal">—</div><div class="sub">명</div></div>
+  <div class="card c-done"><div class="lbl">제출 완료</div><div class="val" id="cDone">—</div><div class="sub">명</div></div>
+  <div class="card c-pend"><div class="lbl">미제출</div><div class="val" id="cPend">—</div><div class="sub">명</div></div>
+  <div class="card c-rate"><div class="lbl">제출률</div><div class="val" id="cRate">—</div><div class="sub">%</div></div>
+</div>
+
+<div class="prog-wrap">
+  <div class="prog-top"><span>제출 진행률</span><span id="progTxt">0 / 0</span></div>
+  <div class="prog-bar"><div class="prog-fill" id="progFill" style="width:0%"></div></div>
+</div>
+
+<div class="url-box">
+  <h3>🔗 학생 개인 URL 생성기</h3>
+  <div class="url-form">
+    <div class="f"><label>학년</label><input id="ug_g" value="2" maxlength="1"></div>
+    <div class="f"><label>반</label><input id="ug_c" value="3" maxlength="2"></div>
+    <div class="f"><label>번호</label><input id="ug_n" value="1" maxlength="2"></div>
+    <div class="f f-name"><label>이름</label><input id="ug_nm" value="홍길동" maxlength="10"></div>
+    <button class="btn btn-export" onclick="genURL()" style="height:34px;">URL 생성</button>
+  </div>
+  <div class="url-result" id="urlResult" style="display:none;">
+    <code id="urlCode"></code>
+    <button class="copy-btn" onclick="copyURL()">📋 복사</button>
+  </div>
+  <div class="url-tip">💡 생성된 URL을 학생에게 카카오톡·구글클래스룸·이메일로 전달하세요.</div>
+</div>
+
+<div class="tabs">
+  <div class="tab active" onclick="switchTab('all',this)">전체 명단</div>
+  <div class="tab" onclick="switchTab('done',this)">제출 완료</div>
+  <div class="tab" onclick="switchTab('pend',this)">미제출</div>
+</div>
+<div class="tabs-border"></div>
+
+<div class="tbl-area">
+  <div class="tbl-toolbar">
+    <div class="search">
+      <span>🔍</span>
+      <input id="searchInp" type="text" placeholder="이름 또는 번호 검색..." oninput="renderTable()">
+    </div>
+  </div>
+  <table>
+    <thead>
+      <tr>
+        <th>번호</th><th>이름</th><th>관심 분야</th>
+        <th>기업 A</th><th>기업 B</th><th>최종 선택</th>
+        <th>제출 상태</th><th>제출 시각</th><th>상세</th>
+      </tr>
+    </thead>
+    <tbody id="tBody"></tbody>
+  </table>
+</div>
+
+<div class="modal-bg" id="modalBg" onclick="if(event.target===this)closeModal()">
+  <div class="modal" id="modalContent"></div>
+</div>
+
+<script>
+// ★ Google Apps Script URL (메모장에서 여기만 바꾸면 됩니다)
+var GAS_URL = 'https://script.google.com/macros/s/AKfycbzP_3Vj5hurkCjQdtMEMb_KvICnDK7PT6M8bYRaOuwye7mjl2e5zW_94Zp1M4OvVKTp/exec';
+
+// ★ 학생 명단 (이름만 수정하세요)
+var NAMES = [
+  '김민준','이서연','박지호','최예린','정현우','강수빈','조민서','윤도현','한지아','임태양',
+  '송예원','오준혁','신하린','권시우','류나은','안준서','황지민','문서준','배하은','전우진',
+  '허지우','남소율','심현준','홍나연','유준호','백서아','고민재','석예나','차도윤','엄지수'
+];
+var GRADE='2', CLASS='3';
+
+var STUDENTS = NAMES.map(function(nm,i){
+  return {grade:GRADE,cls:CLASS,num:String(i+1).padStart(2,'0'),name:nm,status:'none',data:null,submitted_at:''};
+});
+var curTab='all';
+
+function loadData(){
+  document.getElementById('lastUpd').textContent='새로고침 중...';
+  if(GAS_URL==='https://script.google.com/macros/s/AKfycbzP_3Vj5hurkCjQdtMEMb_KvICnDK7PT6M8bYRaOuwye7mjl2e5zW_94Zp1M4OvVKTp/exec'){
+    updateSummary(); renderTable();
+    document.getElementById('lastUpd').textContent='⚠️ GAS URL 미설정 (샘플 표시 중)';
+    return;
+  }
+  fetch(GAS_URL+'?action=getAll')
+    .then(function(r){return r.json();})
+    .then(function(rows){
+      // 초기화
+      STUDENTS.forEach(function(s){s.status='none';s.data=null;s.submitted_at='';});
+      rows.forEach(function(row){
+        var s=STUDENTS.find(function(s){return s.num===String(row.num).padStart(2,'0') && s.cls===String(row.cls);});
+        if(s){s.status='done';s.submitted_at=row.submitted_at;s.data=row;}
+      });
+      updateSummary(); renderTable();
+      document.getElementById('lastUpd').textContent='마지막 갱신: '+new Date().toLocaleTimeString('ko-KR');
+    }).catch(function(e){
+      document.getElementById('lastUpd').textContent='오류: '+e.message;
+    });
+}
+
+function updateSummary(){
+  var total=STUDENTS.length;
+  var done=STUDENTS.filter(function(s){return s.status==='done';}).length;
+  document.getElementById('cTotal').textContent=total;
+  document.getElementById('cDone').textContent=done;
+  document.getElementById('cPend').textContent=total-done;
+  document.getElementById('cRate').textContent=total?Math.round(done/total*100):0;
+  document.getElementById('progFill').style.width=total?Math.round(done/total*100)+'%':'0%';
+  document.getElementById('progTxt').textContent=done+' / '+total;
+  document.getElementById('classInfo').textContent=GRADE+'학년 '+CLASS+'반 · '+total+'명';
+}
+
+function switchTab(t,el){
+  curTab=t;
+  document.querySelectorAll('.tab').forEach(function(x){x.classList.remove('active');});
+  el.classList.add('active');
+  renderTable();
+}
+
+function renderTable(){
+  var q=document.getElementById('searchInp').value.trim().toLowerCase();
+  var filtered=STUDENTS.filter(function(s){
+    if(curTab==='done'&&s.status!=='done') return false;
+    if(curTab==='pend'&&s.status==='done') return false;
+    if(q&&s.name.toLowerCase().indexOf(q)<0&&s.num.indexOf(q)<0) return false;
+    return true;
+  });
+  if(!filtered.length){
+    document.getElementById('tBody').innerHTML='<tr><td colspan="9"><div class="empty">해당하는 학생이 없어요</div></td></tr>';
+    return;
+  }
+  var html='';
+  filtered.forEach(function(s){
+    var d=s.data||{};
+    var badge=s.status==='done'
+      ?'<span class="badge done">✓ 제출완료</span>'
+      :'<span class="badge pend">⏳ 미제출</span>';
+    html+='<tr>'
+      +'<td>'+s.num+'</td><td><strong>'+s.name+'</strong></td>'
+      +'<td>'+(d.interest||'—')+'</td>'
+      +'<td>'+(d.cA_name||'—')+'</td>'
+      +'<td>'+(d.cB_name||'—')+'</td>'
+      +'<td style="font-weight:700;color:#1e6b57;">'+(d.final_company||'—')+'</td>'
+      +'<td>'+badge+'</td>'
+      +'<td style="font-size:11px;color:#aaa;">'+(s.submitted_at||'—')+'</td>'
+      +'<td><button class="detail-btn"'+(s.status!=='done'?' disabled':'')+' onclick="showDetail(\''+s.num+'\')">보기</button></td>'
+      +'</tr>';
+  });
+  document.getElementById('tBody').innerHTML=html;
+}
+
+function showDetail(num){
+  var s=STUDENTS.find(function(x){return x.num===num;});
+  if(!s||!s.data) return;
+  var d=s.data;
+  var h='<div class="modal-hdr"><h2>'+s.grade+'학년 '+s.cls+'반 '+s.num+'번 '+s.name+'</h2><button class="modal-close" onclick="closeModal()">×</button></div>';
+  h+='<div class="m-sec"><h3>① 관심 분야</h3>'
+    +'<div class="m-row"><div class="m-key">관심 분야</div><div class="m-val">'+(d.interest||'—')+'</div></div>'
+    +'<div class="m-row"><div class="m-key">관심 이유</div><div class="m-val">'+(d.reason||'—')+'</div></div></div>';
+  h+='<div class="m-sec"><h3>② 관심 기업 탐색</h3><div class="m-2col">'
+    +'<div class="m-col-a"><div class="m-col-title a">기업 A: '+(d.cA_name||'—')+'</div>'
+    +'<div class="m-row"><div class="m-key">첫인상</div><div class="m-val">'+(d.cA_first||'—')+'</div></div></div>'
+    +'<div class="m-col-b"><div class="m-col-title b">기업 B: '+(d.cB_name||'—')+'</div>'
+    +'<div class="m-row"><div class="m-key">첫인상</div><div class="m-val">'+(d.cB_first||'—')+'</div></div></div></div></div>';
+  h+='<div class="m-sec"><h3>③ 기업 이해하기</h3><div class="m-2col">'
+    +'<div class="m-col-a"><div class="m-col-title a">기업 A</div>'
+    +'<div class="m-row"><div class="m-key">하는 일</div><div class="m-val">'+(d.cA_job||'—')+'</div></div>'
+    +'<div class="m-row"><div class="m-key">대표 서비스</div><div class="m-val">'+(d.cA_svc||'—')+'</div></div>'
+    +'<div class="m-row"><div class="m-key">관련 직무</div><div class="m-val">'+(d.cA_role||'—')+'</div></div></div>'
+    +'<div class="m-col-b"><div class="m-col-title b">기업 B</div>'
+    +'<div class="m-row"><div class="m-key">하는 일</div><div class="m-val">'+(d.cB_job||'—')+'</div></div>'
+    +'<div class="m-row"><div class="m-key">대표 서비스</div><div class="m-val">'+(d.cB_svc||'—')+'</div></div>'
+    +'<div class="m-row"><div class="m-key">관련 직무</div><div class="m-val">'+(d.cB_role||'—')+'</div></div></div></div></div>';
+  h+='<div class="m-sec"><h3>④ 기업 비교하기</h3>'
+    +'<table class="m-tbl"><thead><tr>'
+    +'<th class="th-item">비교 항목</th><th class="th-a">기업 A</th><th class="th-b">기업 B</th></tr></thead><tbody>'
+    +'<tr><td>기업 특징</td><td>'+(d.cmp_feature_a||'—')+'</td><td>'+(d.cmp_feature_b||'—')+'</td></tr>'
+    +'<tr><td>분위기 이미지</td><td>'+(d.cmp_mood_a||'—')+'</td><td>'+(d.cmp_mood_b||'—')+'</td></tr>'
+    +'<tr><td>관심 가는 점</td><td>'+(d.cmp_interest_a||'—')+'</td><td>'+(d.cmp_interest_b||'—')+'</td></tr>'
+    +'<tr><td>나와 맞는 이유</td><td>'+(d.cmp_fit_a||'—')+'</td><td>'+(d.cmp_fit_b||'—')+'</td></tr>'
+    +'</tbody></table></div>';
+  h+='<div class="m-final"><div class="lbl">🏆 최종 선택:</div><div class="val" style="font-weight:700;">'+(d.final_company||'—')+'</div>'
+    +'<div class="lbl" style="margin-left:16px;">이유:</div><div class="val">'+(d.final_reason||'—')+'</div></div>';
+  h+='<div style="font-size:11px;color:#aaa;text-align:right;margin-top:10px;">제출: '+(s.submitted_at||'—')+'</div>';
+  document.getElementById('modalContent').innerHTML=h;
+  document.getElementById('modalBg').classList.add('show');
+}
+function closeModal(){document.getElementById('modalBg').classList.remove('show');}
+
+function genURL(){
+  var base=location.href.replace(/[^/]*$/,'')+'student.html';
+  var url=base+'?grade='+encodeURIComponent(document.getElementById('ug_g').value)
+    +'&class='+encodeURIComponent(document.getElementById('ug_c').value)
+    +'&num='+encodeURIComponent(document.getElementById('ug_n').value)
+    +'&name='+encodeURIComponent(document.getElementById('ug_nm').value);
+  document.getElementById('urlCode').textContent=url;
+  document.getElementById('urlResult').style.display='flex';
+}
+function copyURL(){
+  navigator.clipboard.writeText(document.getElementById('urlCode').textContent)
+    .then(function(){alert('복사됐어요!');});
+}
+
+function exportCSV(){
+  var rows=[['학년','반','번호','이름','관심분야','관심이유','기업A','기업A첫인상','기업A하는일','기업A서비스','기업A직무','기업B','기업B첫인상','기업B하는일','기업B서비스','기업B직무','비교특징A','비교특징B','비교분위기A','비교분위기B','비교관심A','비교관심B','비교적합A','비교적합B','최종기업','최종이유','제출상태','제출시각']];
+  STUDENTS.forEach(function(s){
+    var d=s.data||{};
+    rows.push([s.grade,s.cls,s.num,s.name,d.interest||'',d.reason||'',d.cA_name||'',d.cA_first||'',d.cA_job||'',d.cA_svc||'',d.cA_role||'',d.cB_name||'',d.cB_first||'',d.cB_job||'',d.cB_svc||'',d.cB_role||'',d.cmp_feature_a||'',d.cmp_feature_b||'',d.cmp_mood_a||'',d.cmp_mood_b||'',d.cmp_interest_a||'',d.cmp_interest_b||'',d.cmp_fit_a||'',d.cmp_fit_b||'',d.final_company||'',d.final_reason||'',s.status==='done'?'제출완료':'미제출',s.submitted_at||'']);
+  });
+  var csv='\uFEFF'+rows.map(function(r){return r.map(function(c){return '"'+String(c).replace(/"/g,'""')+'"';}).join(',');}).join('\n');
+  var blob=new Blob([csv],{type:'text/csv;charset=utf-8;'});
+  var a=document.createElement('a');a.href=URL.createObjectURL(blob);
+  a.download='기업탐색_제출현황.csv';a.click();
+}
+
+loadData();
+setInterval(loadData,30000);
+</script>
+</body>
+</html>
