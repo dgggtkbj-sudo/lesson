@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>우리 취업처 기업 보드</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Gaegu:wght@700&family=Noto+Sans+KR:wght@400;500;700;900&display=swap');
+:root{
+  --ink:#3a4557; --sub:#6b7a8f; --paper:#f6f8fb;
+  --sky:#3f8fc7; --sky-l:#eaf5fd;
+  --peach:#e08a3c; --peach-l:#fff3e4;
+  --pink:#e35d84; --pink-l:#fff0f5;
+  --mint:#3fa583; --mint-l:#edfaf5;
+  --lav:#8467d6; --lav-l:#f5f1fe;
+  --gray:#7e8ba3; --gray-l:#f2f4f8;
+}
+*{box-sizing:border-box; margin:0; padding:0;}
+body{font-family:'Noto Sans KR',sans-serif; background:var(--paper); color:var(--ink); padding:28px 4vw 60px;}
+
+header{max-width:1400px; margin:0 auto 22px;}
+.eyebrow{display:inline-block; background:var(--sky); color:#fff; font-size:13px; font-weight:700; padding:5px 14px; border-radius:999px; letter-spacing:1px;}
+h1{font-size:clamp(26px,3.4vw,40px); font-weight:900; margin:10px 0 6px; letter-spacing:-1px;}
+h1 .accent{color:var(--sky);}
+.sub{color:var(--sub); font-size:15px;}
+.hint{margin-top:10px; font-size:13.5px; color:var(--sub); background:#fff; border:1.4px dashed var(--sky); border-radius:12px; padding:9px 14px; display:inline-block;}
+
+.toolbar{max-width:1400px; margin:18px auto 8px; display:flex; flex-wrap:wrap; gap:8px; align-items:center;}
+.tab{border:1.6px solid var(--sub); background:#fff; color:var(--ink); font-weight:700; font-size:14px;
+  padding:7px 15px; border-radius:999px; cursor:pointer; transition:.15s;}
+.tab:hover{transform:translateY(-1px);}
+.tab.active{background:var(--ink); color:#fff; border-color:var(--ink);}
+#searchBox{margin-left:auto; padding:9px 16px; border-radius:999px; border:1.6px solid #cdd5e0; font-size:14px; width:230px; font-family:inherit;}
+#searchBox:focus{outline:none; border-color:var(--sky);}
+
+.count{max-width:1400px; margin:0 auto 14px; font-size:13px; color:var(--sub);}
+
+.board{max-width:1400px; margin:0 auto; display:flex; flex-direction:column; gap:26px;}
+.group{border-radius:20px; overflow:hidden; background:#fff; box-shadow:0 4px 20px rgba(58,69,87,.07);}
+.group-head{padding:13px 20px; color:#fff; font-weight:900; font-size:18px; display:flex; align-items:center; gap:10px;}
+.group-head .n{font-size:13px; font-weight:700; background:rgba(255,255,255,.3); padding:2px 10px; border-radius:999px;}
+.grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:12px; padding:16px;}
+
+.card{border-radius:14px; border:1.6px solid #e5e9f0; background:#fff; padding:13px 14px 11px;
+  cursor:pointer; transition:.15s; position:relative; display:flex; flex-direction:column; gap:6px;}
+.card:hover{transform:translateY(-3px); box-shadow:0 8px 18px rgba(58,69,87,.13); border-color:currentColor;}
+.card .name{font-weight:900; font-size:16.5px; line-height:1.3;}
+.card .desc{font-size:12.5px; color:var(--sub); min-height:17px;}
+.card .links{display:flex; gap:6px; margin-top:4px;}
+.card .links a{font-size:11.5px; font-weight:700; text-decoration:none; padding:4px 10px; border-radius:999px;
+  border:1.2px solid currentColor; transition:.12s;}
+.card .links a:hover{color:#fff !important;}
+.badge{position:absolute; top:10px; right:10px; font-size:10.5px; font-weight:900; padding:2px 8px; border-radius:999px; color:#fff;}
+.badge.senior{background:var(--sky);}
+.badge.mystery{background:var(--lav);}
+
+/* group color themes */
+.g-sky  .group-head{background:linear-gradient(90deg,#3f8fc7,#63aede);} .g-sky  .card{color:var(--sky);}  .g-sky  .card .links a:hover{background:var(--sky);}
+.g-peach .group-head{background:linear-gradient(90deg,#e08a3c,#f0a860);} .g-peach .card{color:var(--peach);} .g-peach .card .links a:hover{background:var(--peach);}
+.g-mint .group-head{background:linear-gradient(90deg,#3fa583,#5cc09c);} .g-mint .card{color:var(--mint);}  .g-mint .card .links a:hover{background:var(--mint);}
+.g-lav  .group-head{background:linear-gradient(90deg,#8467d6,#a48ee8);} .g-lav  .card{color:var(--lav);}   .g-lav  .card .links a:hover{background:var(--lav);}
+.g-pink .group-head{background:linear-gradient(90deg,#e35d84,#f080a0);} .g-pink .card{color:var(--pink);}  .g-pink .card .links a:hover{background:var(--pink);}
+.g-gray .group-head{background:linear-gradient(90deg,#5c6b85,#7e8ba3);} .g-gray .card{color:var(--gray);}  .g-gray .card .links a:hover{background:var(--gray);}
+.card .name, .card .desc{color:var(--ink);}
+.card .desc{color:var(--sub);}
+
+footer{max-width:1400px; margin:34px auto 0; text-align:center; font-size:13px; color:var(--sub);}
+</style>
+</head>
+<body>
+
+<header>
+  <span class="eyebrow">우리 학교 취업처 · 기업 보드</span>
+  <h1>우리 취업처 기업, <span class="accent">한눈에 보기</span></h1>
+  <p class="sub">기업 카드를 클릭하면 네이버 검색으로 연결돼요. 홈페이지 · 뉴스 · 지도를 바로 확인할 수 있어요.</p>
+  <div class="hint">💡 <b>채용</b> 버튼은 사람인 기업정보, <b>지도</b> 버튼은 네이버 지도로 연결됩니다 · <span style="color:#3f8fc7;font-weight:700">선배 진출</span> 배지는 선배들이 실제로 취업/합격한 곳!</div>
+</header>
+
+<div class="toolbar" id="tabs"></div>
+<div class="count" id="count"></div>
+<div class="board" id="board"></div>
+
+<footer>기업 정보는 검색을 통해 직접 확인하세요 — 이름만 보고 지나치면 보석 같은 회사를 놓칠 수 있어요!</footer>
+
+<script>
+const GROUPS = [
+  { id:"semi", name:"반도체 · 전자", theme:"g-sky", items:[
+    {n:"㈜이수페타시스", d:"반도체용 고다층 기판(PCB)", senior:true},
+    {n:"앰코테크놀로지코리아", d:"반도체 패키징·테스트", senior:true},
+    {n:"스태츠칩팩코리아", d:"반도체 패키징·테스트", senior:true, q:"스태츠칩팩코리아"},
+    {n:"제이셋스태츠칩팩코리아", d:"반도체 패키징·테스트", senior:true},
+    {n:"온세미컨덕터코리아㈜", d:"전력반도체", senior:true, q:"온세미컨덕터코리아"},
+    {n:"㈜네패스아크", d:"반도체 테스트"},
+    {n:"㈜KH바텍", d:"폴더블폰 힌지·정밀부품"},
+    {n:"아바텍", d:"디스플레이 유리 가공", q:"아바텍 구미"},
+  ]},
+  { id:"auto", name:"자동차 부품 · 기계 · 로봇", theme:"g-peach", items:[
+    {n:"평화산업", d:"방진고무·호스"},
+    {n:"평화오일씰공업", d:"오일씰"},
+    {n:"㈜화신정공", d:"섀시 부품"},
+    {n:"아진산업㈜", d:"차체 부품", q:"아진산업"},
+    {n:"(주)세원물산", d:"차체 부품", q:"세원물산"},
+    {n:"㈜신라공업", d:"자동차 부품", q:"신라공업 경주"},
+    {n:"(주)동보", d:"변속기 기어·샤프트", q:"동보 자동차부품"},
+    {n:"㈜세아메카닉스", d:"알루미늄 다이캐스팅", q:"세아메카닉스"},
+    {n:"㈜금창", d:"자동차 부품", q:"금창 자동차"},
+    {n:"㈜한중엔시에스", d:"ESS 냉각·자동차 부품", q:"한중엔시에스"},
+    {n:"우진플라임", d:"플라스틱 사출성형기"},
+    {n:"대주기계", d:"산업용 공기압축기", q:"대주기계 대구"},
+    {n:"아이엠로보틱스㈜", d:"로봇", q:"아이엠로보틱스"},
+    {n:"㈜로볼루션", d:"로봇", q:"로볼루션"},
+  ]},
+  { id:"steel", name:"방위산업 · 철강 · 소재", theme:"g-gray", items:[
+    {n:"LIG넥스원㈜", d:"유도무기 등 방위산업", q:"LIG넥스원"},
+    {n:"㈜한국카본", d:"탄소섬유·LNG선 소재", q:"한국카본"},
+    {n:"한국열연(주)", d:"철강 가공", q:"한국열연"},
+    {n:"진일스틸㈜", d:"철강", q:"진일스틸"},
+  ]},
+  { id:"dental", name:"치과 · 의료", theme:"g-pink", items:[
+    {n:"㈜덴티스", d:"임플란트·의료기기", q:"덴티스 임플란트"},
+    {n:"영광치과기공소", d:"치과 보철물 제작"},
+    {n:"에프앤이치과기공소", d:"치과 보철물 제작"},
+    {n:"A-tech치과기공소", d:"치과 보철물 제작"},
+    {n:"D&S치과기공소", d:"치과 보철물 제작"},
+  ]},
+  { id:"food", name:"식품 · 외식 · 제빵", theme:"g-mint", items:[
+    {n:"㈜우양", d:"핫도그·냉동식품 (핫도그 국내 1위)", q:"우양 핫도그"},
+    {n:"웅진식품㈜", d:"음료", q:"웅진식품"},
+    {n:"오케이에프음료㈜", d:"알로에 음료 수출", q:"OKF 음료"},
+    {n:"CJ푸드빌", d:"빕스 등 외식 브랜드", senior:true},
+    {n:"현대그린푸드", d:"단체급식·식자재", senior:true},
+    {n:"로쏘㈜", d:"대전 성심당 운영", senior:true, q:"로쏘 성심당"},
+    {n:"유가제빵소", d:"베이커리", senior:true},
+    {n:"㈜씨저", d:"직접 찾아보세요!", senior:true, mystery:true, q:"주식회사 씨저"},
+    {n:"(주)신원아이엔디", d:"직접 찾아보세요!", senior:true, mystery:true, q:"신원아이엔디"},
+  ]},
+  { id:"logi", name:"물류 · 유통", theme:"g-sky", items:[
+    {n:"쿠팡풀필먼트서비스(유)", d:"물류센터 운영", senior:true, q:"쿠팡풀필먼트서비스"},
+  ]},
+  { id:"mystery", name:"탐정 미션 — 무슨 회사인지 직접 밝혀내라!", theme:"g-lav", items:[
+    {n:"(주)에이치티솔루션", mystery:true, q:"에이치티솔루션"},
+    {n:"(주)에이블", mystery:true, q:"주식회사 에이블"},
+    {n:"케이웰솔루션스", mystery:true},
+    {n:"엠티에스코퍼레이션", mystery:true},
+    {n:"에이치알에스코리아", mystery:true},
+    {n:"㈜아이큐랩", mystery:true, q:"아이큐랩"},
+    {n:"다울하이텍", mystery:true},
+    {n:"(주)삼광", mystery:true, q:"주식회사 삼광"},
+    {n:"㈜건화이엔지", mystery:true, q:"건화이엔지"},
+    {n:"에스엠테크(주)", mystery:true, q:"에스엠테크"},
+    {n:"(주)에스티개발", mystery:true, q:"에스티개발"},
+    {n:"(주)기성엔지니어링", mystery:true, q:"기성엔지니어링"},
+    {n:"㈜신독", mystery:true, q:"주식회사 신독"},
+    {n:"㈜엠디", mystery:true, q:"주식회사 엠디"},
+    {n:"주식회사 델콘", mystery:true, q:"델콘"},
+    {n:"(주)예스바이오테크", mystery:true, q:"예스바이오테크"},
+    {n:"㈜스페이스프로", mystery:true, q:"스페이스프로"},
+    {n:"㈜쓰리에이치", mystery:true, q:"쓰리에이치"},
+    {n:"㈜아이디에스", mystery:true, q:"아이디에스"},
+    {n:"경림테크㈜", mystery:true, q:"경림테크"},
+    {n:"㈜대전사", mystery:true, q:"주식회사 대전사"},
+    {n:"욱일산업㈜", mystery:true, q:"욱일산업"},
+  ]},
+];
+
+const board = document.getElementById('board');
+const tabs = document.getElementById('tabs');
+const countEl = document.getElementById('count');
+const searchBox = document.createElement('input');
+searchBox.id = 'searchBox';
+searchBox.placeholder = '🔍 기업 이름 검색';
+
+let activeTab = 'all';
+
+function naverUrl(c){ return 'https://search.naver.com/search.naver?query=' + encodeURIComponent(c.q || c.n.replace(/[㈜()（）주식회사]/g,'').trim() || c.n); }
+function saraminUrl(c){ return 'https://www.saramin.co.kr/zf_user/search?searchword=' + encodeURIComponent((c.q || c.n).replace(/[㈜()（）]/g,'').trim()); }
+function mapUrl(c){ return 'https://map.naver.com/p/search/' + encodeURIComponent((c.q || c.n).replace(/[㈜()（）]/g,'').trim()); }
+
+function render(){
+  board.innerHTML = '';
+  const kw = searchBox.value.trim();
+  let shown = 0, total = 0;
+  GROUPS.forEach(g=>{
+    total += g.items.length;
+    if(activeTab !== 'all' && activeTab !== g.id) return;
+    const items = g.items.filter(c => !kw || c.n.includes(kw) || (c.d||'').includes(kw));
+    if(items.length === 0) return;
+    shown += items.length;
+    const sec = document.createElement('section');
+    sec.className = 'group ' + g.theme;
+    sec.innerHTML = '<div class="group-head">' + g.name + ' <span class="n">' + items.length + '곳</span></div>';
+    const grid = document.createElement('div');
+    grid.className = 'grid';
+    items.forEach(c=>{
+      const card = document.createElement('div');
+      card.className = 'card';
+      let badge = '';
+      if(c.senior) badge = '<span class="badge senior">선배 진출</span>';
+      else if(c.mystery) badge = '<span class="badge mystery">? 미션</span>';
+      card.innerHTML = badge +
+        '<div class="name">' + c.n + '</div>' +
+        '<div class="desc">' + (c.d || '어떤 회사일까? 클릭해서 알아보자!') + '</div>' +
+        '<div class="links">' +
+          '<a href="' + saraminUrl(c) + '" target="_blank" rel="noopener" onclick="event.stopPropagation()">채용</a>' +
+          '<a href="' + mapUrl(c) + '" target="_blank" rel="noopener" onclick="event.stopPropagation()">지도</a>' +
+        '</div>';
+      card.addEventListener('click', ()=> window.open(naverUrl(c), '_blank', 'noopener'));
+      grid.appendChild(card);
+    });
+    sec.appendChild(grid);
+    board.appendChild(sec);
+  });
+  countEl.textContent = '표시 중: ' + shown + '곳 / 전체 ' + total + '곳';
+  if(shown === 0) board.innerHTML = '<p style="color:#6b7a8f; padding:30px; text-align:center;">검색 결과가 없어요. 다른 이름으로 찾아보세요!</p>';
+}
+
+// tabs
+const allBtn = document.createElement('button');
+allBtn.className = 'tab active'; allBtn.textContent = '전체';
+allBtn.onclick = ()=>{ activeTab='all'; setActive(allBtn); render(); };
+tabs.appendChild(allBtn);
+GROUPS.forEach(g=>{
+  const b = document.createElement('button');
+  b.className = 'tab'; b.textContent = g.name.split(' — ')[0];
+  b.onclick = ()=>{ activeTab=g.id; setActive(b); render(); };
+  tabs.appendChild(b);
+});
+tabs.appendChild(searchBox);
+searchBox.addEventListener('input', render);
+function setActive(btn){ tabs.querySelectorAll('.tab').forEach(t=>t.classList.remove('active')); btn.classList.add('active'); }
+
+render();
+</script>
+</body>
+</html>
